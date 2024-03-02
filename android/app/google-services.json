@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "298015005381",
+    "project_id": "dic-buldhana",
+    "storage_bucket": "dic-buldhana.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:298015005381:android:103028b6d20cac6804aeac",
+        "android_client_info": {
+          "package_name": "com.gtech.flutter.flutterauth"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCq_UUGnvxN25_p5NIn--TU7Zw5rmZ0yDY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
