@@ -3,6 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'homescreen.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -95,8 +97,10 @@ class _LoginPageState extends State<LoginPage> {
               // positional(b, a)
               // namedParameter( )
 
-              gotoNextSceen(number: numberController, name: nameController);
+              // gotoNextSceen(number: numberController, name: nameController);
               // _verifyPhoneNumber(); // Call _verifyPhoneNumber method
+              loginwithEmailPassword(
+                  number: numberController, name: nameController);
             }
           },
         ),
@@ -112,28 +116,29 @@ class _LoginPageState extends State<LoginPage> {
                 TextFormField(
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter Name';
+                      return 'Please enter username';
                     }
                     return null;
                   },
                   controller: nameController,
                   decoration: const InputDecoration(
-                      border: OutlineInputBorder(), hintText: 'Enter Name'),
+                      border: OutlineInputBorder(),
+                      hintText: 'Enter User Name'),
                 ),
                 const SizedBox(
                   height: 10,
                 ),
                 TextFormField(
-                  keyboardType: TextInputType.number,
+                  keyboardType: TextInputType.text,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please Enter Your  Number';
+                      return 'Please Enter your  password';
                     }
                     return null;
                   },
                   controller: numberController,
                   decoration: const InputDecoration(
-                      border: OutlineInputBorder(), hintText: 'Enter Number'),
+                      border: OutlineInputBorder(), hintText: 'Enter Password'),
                 ),
               ],
             ),
@@ -158,9 +163,36 @@ class _LoginPageState extends State<LoginPage> {
       'name': name.text,
       'phone': number.text,
     }).then((value) => {
-    ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('Data saved!!!')),
-    )
-    });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Data saved!!!')),
+          )
+        });
   }
+
+  loginwithEmailPassword(
+      {required TextEditingController name,
+      required TextEditingController number}) {
+    FirebaseAuth.instance
+        .createUserWithEmailAndPassword(
+            email: '${number.text}@gtech.com', password: number.text)
+        .then((value) => {
+              //If successfull then add user data
+              FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(number.text)
+                  .set({
+                'name': value.user?.email!.toString(),
+                'phone': number.text,
+              }).then((value) => {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Data saved!!!')),
+                        ),
+              Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()),)
+
+              })
+            });
+  }
+
 }
