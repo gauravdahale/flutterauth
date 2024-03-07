@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'homescreen.dart';
 
+enum SingingCharacter { signIn, signUp }
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -17,6 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final numberController = TextEditingController();
+  SingingCharacter? _character = SingingCharacter.signUp;
 
 //? Callbacks for phone auth
 //TO VERIFIY OTP
@@ -76,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
       print('Error: $e');
     }
   }
-
+// OTP ENDED
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,61 +89,109 @@ class _LoginPageState extends State<LoginPage> {
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.send),
           onPressed: () {
-            if (!_formKey.currentState!.validate()) {
+            if (_character == SingingCharacter.signUp) {
+              if (!_formKey.currentState!.validate()) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Error in Form')),
+                );
+              } else {
+                print('ONTO ELSE');
+
+                // positional(a, b)
+                // positional(b, a)
+                // namedParameter( )
+
+                // gotoNextSceen(number: numberController, name: nameController);
+                // _verifyPhoneNumber(); // Call _verifyPhoneNumber method
+                createUser(
+                    number: numberController, name: nameController);
+              }
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Error in Form')),
+                const SnackBar(content: Text('Into sign Up')),
               );
-            } else {
-              print('ONTO ELSE');
-
-              // positional(a, b)
-              // positional(b, a)
-              // namedParameter( )
-
-              // gotoNextSceen(number: numberController, name: nameController);
-              // _verifyPhoneNumber(); // Call _verifyPhoneNumber method
-              loginwithEmailPassword(
-                  number: numberController, name: nameController);
+            } else if (_character == SingingCharacter.signIn) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Into sign In')),
+              );
             }
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('${_character}')),
+            );
           },
         ),
         body: Form(
           key: _formKey,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                const SizedBox(
-                  height: 100,
+            child: Card(
+              elevation: 8.0,
+              margin: const EdgeInsets.all(8.0),
+              child: Container(
+                margin: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 100,
+                    ),
+                    TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter username';
+                        }
+                        return null;
+                      },
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Enter User Name'),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    TextFormField(
+                      keyboardType: TextInputType.text,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please Enter your  password';
+                        }
+                        return null;
+                      },
+                      controller: numberController,
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Enter Password'),
+                    ),
+                    const SizedBox(
+                      height: 10.0,
+                    ),
+                    ListTile(
+                      title: const Text('Sign In'),
+                      leading: Radio<SingingCharacter>(
+                        value: SingingCharacter.signIn,
+                        groupValue: _character,
+                        onChanged: (SingingCharacter? value) {
+                          setState(() {
+                            _character = value;
+                          });
+                        },
+                      ),
+                    ),
+                    ListTile(
+                      title: const Text('Sign Up'),
+                      leading: Radio<SingingCharacter>(
+                        value: SingingCharacter.signUp,
+                        groupValue: _character,
+                        onChanged: (SingingCharacter? value) {
+                          setState(() {
+                            _character = value;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                TextFormField(
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter username';
-                    }
-                    return null;
-                  },
-                  controller: nameController,
-                  decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Enter User Name'),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  keyboardType: TextInputType.text,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please Enter your  password';
-                    }
-                    return null;
-                  },
-                  controller: numberController,
-                  decoration: const InputDecoration(
-                      border: OutlineInputBorder(), hintText: 'Enter Password'),
-                ),
-              ],
+              ),
             ),
           ),
         ));
@@ -169,9 +220,7 @@ class _LoginPageState extends State<LoginPage> {
         });
   }
 
-  loginwithEmailPassword(
-      {required TextEditingController name,
-      required TextEditingController number}) {
+  createUser({required TextEditingController name, required TextEditingController number}) {
     FirebaseAuth.instance
         .createUserWithEmailAndPassword(
             email: '${number.text}@gtech.com', password: number.text)
@@ -187,12 +236,11 @@ class _LoginPageState extends State<LoginPage> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Data saved!!!')),
                         ),
-              Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomeScreen()),)
-
-              })
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                        )
+                      })
             });
   }
-
 }
